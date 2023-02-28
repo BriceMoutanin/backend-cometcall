@@ -21,6 +21,7 @@ coverage
 .nyc_output
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Grunt intermediate storage (
 http://gruntjs.com/creating-plugins#storing-task-files
 )
@@ -35,11 +36,22 @@ https://bower.io/
 
 # Bower dependency directory (https://bower.io/)
 >>>>>>> dcf9e82047f45e709ac528a32fc759d070fd5d0d
+=======
+# Grunt intermediate storage (
+http://gruntjs.com/creating-plugins#storing-task-files
+)
+.grunt
+
+# Bower dependency directory (
+https://bower.io/
+)
+>>>>>>> e132bbd96266456b40a2b5fcb0d18e6a4a8d65fc
 bower_components
 
 # node-waf configuration
 .lock-wscript
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 # Compiled binary addons (
 https://nodejs.org/api/addons.html
@@ -47,6 +59,11 @@ https://nodejs.org/api/addons.html
 =======
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 >>>>>>> dcf9e82047f45e709ac528a32fc759d070fd5d0d
+=======
+# Compiled binary addons (
+https://nodejs.org/api/addons.html
+)
+>>>>>>> e132bbd96266456b40a2b5fcb0d18e6a4a8d65fc
 build/Release
 
 # Dependency directories
@@ -76,7 +93,11 @@ typings/
 
 # next.js build output
 <<<<<<< HEAD
+<<<<<<< HEAD
 .next 
 =======
 .next
 >>>>>>> dcf9e82047f45e709ac528a32fc759d070fd5d0d
+=======
+.next 
+>>>>>>> e132bbd96266456b40a2b5fcb0d18e6a4a8d65fc
