@@ -10,19 +10,11 @@ const enfantSchema = mongoose.Schema({
   etablissement: etablissementSchema,
 });
 
-const typeOrganismeSchema = mongoose.Schema({
-  nom: String,
-});
-
-const problematiqueSchema = mongoose.Schema({
-  titre: String,
-  description: String,
-  typeEtablissement: String,
-  organismes: typeOrganismeSchema,
-});
-
 const historiqueSchema = mongoose.Schema({
-  problematique: problematiqueSchema,
+  problematique: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "problematiques",
+  },
   enfant: enfantSchema,
   date: Date,
 });
@@ -34,11 +26,11 @@ const userSchema = mongoose.Schema({
   token: String,
   email: String,
   tel: String,
-  
+
   enfants: [enfantSchema],
   historiques: [historiqueSchema],
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("users", userSchema);
 
 module.exports = User;
