@@ -4,6 +4,6 @@ const typeOrganismeSchema = mongoose.Schema({
   nom: String,
 });
 
-const TypeOrganisme = mongoose.model("TypeOrganisme", typeOrganismeSchema);
+const TypeOrganisme = mongoose.model("typesOrganisme", typeOrganismeSchema);
 
 module.exports = TypeOrganisme;

@@ -43,7 +43,7 @@ router.post("/signin", (req, res) => {
     res.json({ result: false, error: "informations manquantes" });
     return;
   }
-  //Cette route permet à un utilisateur de s'authentifier en vérifiant son adresse e-mail et son mot de passe avec ceux stockés dans la bdd. 
+  //Cette route permet à un utilisateur de s'authentifier en vérifiant son adresse e-mail et son mot de passe avec ceux stockés dans la bdd.
   User.findOne({ email: req.body.email }).then((data) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token });
@@ -57,10 +57,10 @@ router.post("/signin", (req, res) => {
 });
 
 // Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
-router.post("/:id/profile", (req, res) => {
+router.put("/:parentId", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.id,
+      _id: req.params.parentId,
     },
     { $set: req.body }
   ).then((data) => {
@@ -69,9 +69,9 @@ router.post("/:id/profile", (req, res) => {
 });
 
 // supression de compte utilisateur
-router.delete("/:id", (req, res) => {
+router.delete("/:parentId", (req, res) => {
   User.deleteOne({
-    _id: req.params.id,
+    _id: req.params.parentId,
   }).then((deletedDoc) => {
     if (deletedDoc.deletedCount > 0) {
       res.json({ result: true });
@@ -81,10 +81,14 @@ router.delete("/:id", (req, res) => {
   });
 });
 
-router.post("/:parentId/enfants", (req, res) => {
-  User.updateOne({
-    _id: req.params.parentId
-  }, { $push: { enfants: req.body } }).then((updatedDoc) => {
+// Ajouter un enfant
+router.post("/addEnfant/:parentId", (req, res) => {
+  User.updateOne(
+    {
+      _id: req.params.parentId,
+    },
+    { $push: { enfants: req.body } }
+  ).then((updatedDoc) => {
     if (updatedDoc.modifiedCount > 0) {
       res.json({ result: true });
     } else {
@@ -93,7 +97,7 @@ router.post("/:parentId/enfants", (req, res) => {
   });
 });
 
-router.delete("/:parentId/enfants/:enfantId", (req, res) => {
+router.delete("/removeEnfant/:parentId/:enfantId", (req, res) => {
   User.updateOne(
     {
       _id: req.params.parentId,
@@ -108,18 +112,60 @@ router.delete("/:parentId/enfants/:enfantId", (req, res) => {
   });
 });
 
-router.put("/:parentId/enfants/:enfantId", (req, res) => {
-  const parent = User.findById(req.params.parentId)
-                    .then((data) => {
-                      const enfant = data.enfants.id(req.params.enfantId);
-                      enfant.prenom = req.body.prenom;
-                      enfant.etablissement = req.body.etablissement;
+// Modifier le prénom de l'enfant d'un parent
+router.put("/updatePrenomEnfant/:parentId/:enfantId", (req, res) => {
+  User.updateOne(
+    { _id: req.params.parentId, "enfants._id": req.params.enfantId },
+    { $set: { "enfants.$.prenom": req.body.prenom } }
+  )
+    .then(() => res.json({ result: true }))
+    .catch((error) => {
+      res.status(500).json({ result: false, result: error });
+    });
+});
 
-                      enfant.save().then(savedEnfant => res.json({ result: true, result: data }))
-                                  .catch(error => res.json({ result: false, result: error }));
-                    }).catch(error => {
-                      res.status(500).json({ result: false, result: error });
-                    });
+// Modifier l'établissement de l'enfant d'un parent
+router.put("/updateEtablissementEnfant/:parentId/:enfantId", (req, res) => {
+  User.updateOne(
+    { _id: req.params.parentId, "enfants._id": req.params.enfantId },
+    { $set: { "enfants.$.etablissement": req.body.etablissement } }
+  )
+    .then(() => res.json({ result: true }))
+    .catch((error) => {
+      res.status(500).json({ result: false, result: error });
+    });
+});
+
+router.post("/addHistorique/:parentId", (req, res) => {
+  User.updateOne(
+    {
+      _id: req.params.parentId,
+    },
+    { $push: { historique: req.body } }
+  ).then((updatedDoc) => {
+    if (updatedDoc.modifiedCount > 0) {
+      res.json({ result: true });
+    } else {
+      res.status(500).json({ result: false, error: "Error adding historique" });
+    }
+  });
+});
+
+router.delete("/removeHistorique/:parentId/:historiqueId", (req, res) => {
+  User.updateOne(
+    {
+      _id: req.params.parentId,
+    },
+    { $pull: { historique: { _id: req.params.historiqueId } } }
+  ).then((deletedDoc) => {
+    if (deletedDoc.matchedCount > 0) {
+      res.json({ result: true, result: deletedDoc });
+    } else {
+      res
+        .status(500)
+        .json({ result: false, error: "Error deleting historique" });
+    }
+  });
 });
 
 module.exports = router;

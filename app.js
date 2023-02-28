@@ -8,7 +8,6 @@ require("./models/connection");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var enfantsRouter = require("./routes/enfants");
 var organismesRouter = require("./routes/organismes");
 
 var app = express();
@@ -24,7 +23,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/enfants", enfantsRouter);
 app.use("/organismes", organismesRouter);
 
 module.exports = app;
