@@ -30,7 +30,7 @@ router.post("/signup", (req, res) => {
       });
 
       newUser.save().then(() => {
-        res.json({ result: true });
+        res.json({ result: true, newUser: newUser });
       });
     } else {
       // User already exists in database
@@ -48,7 +48,7 @@ router.post("/signin", (req, res) => {
   //Cette route permet à un utilisateur de s'authentifier en vérifiant son adresse e-mail et son mot de passe avec ceux stockés dans la bdd.
   User.findOne({ email: req.body.email }).then((data) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, token: data.token });
+      res.json({ result: true, user: data });
     } else {
       res.json({
         result: false,
