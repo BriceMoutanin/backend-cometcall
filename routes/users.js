@@ -25,6 +25,8 @@ router.post("/signup", (req, res) => {
         nom: null,
         prenom: null,
         tel: null,
+        enfants: [],
+        historiques: [],
       });
 
       newUser.save().then(() => {
@@ -87,7 +89,14 @@ router.post("/addEnfant/:parentId", (req, res) => {
     {
       _id: req.params.parentId,
     },
-    { $push: { enfants: req.body } }
+    {
+      $push: {
+        enfants: {
+          prenom: req.body.prenom,
+          etablissement: req.body.etablissement,
+        },
+      },
+    }
   ).then((updatedDoc) => {
     if (updatedDoc.modifiedCount > 0) {
       res.json({ result: true });
@@ -136,12 +145,13 @@ router.put("/updateEtablissementEnfant/:parentId/:enfantId", (req, res) => {
     });
 });
 
+// A tester dans le frontend
 router.post("/addHistorique/:parentId", (req, res) => {
   User.updateOne(
     {
       _id: req.params.parentId,
     },
-    { $push: { historique: req.body } }
+    { $push: { historiques: req.body } }
   ).then((updatedDoc) => {
     if (updatedDoc.modifiedCount > 0) {
       res.json({ result: true });
@@ -151,12 +161,13 @@ router.post("/addHistorique/:parentId", (req, res) => {
   });
 });
 
+// A tester dans le frontend
 router.delete("/removeHistorique/:parentId/:historiqueId", (req, res) => {
   User.updateOne(
     {
       _id: req.params.parentId,
     },
-    { $pull: { historique: { _id: req.params.historiqueId } } }
+    { $pull: { historiques: { _id: req.params.historiqueId } } }
   ).then((deletedDoc) => {
     if (deletedDoc.matchedCount > 0) {
       res.json({ result: true, result: deletedDoc });
