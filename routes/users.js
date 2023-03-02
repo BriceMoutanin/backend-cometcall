@@ -82,7 +82,7 @@ router.put("/updateParentByToken/:parentToken", (req, res) => {
   });
 });
 
-// supression de compte utilisateur
+// suppression de compte utilisateur
 router.delete("/:parentId", (req, res) => {
   User.deleteOne({
     _id: req.params.parentId,
@@ -95,11 +95,25 @@ router.delete("/:parentId", (req, res) => {
   });
 });
 
+// Obtenir les enfants
+router.get("/getEnfants/:parentToken", (req, res) => {
+  User.findOne({ token: req.params.parentToken }).then((parent) => {
+    if (parent) {
+      res.json({
+        result: true,
+        enfants: parent.enfants,
+      });
+    } else {
+      res.status(500).json({ result: false, error: "Parent not found" });
+    }
+  });
+});
+
 // Ajouter un enfant
-router.post("/addEnfant/:parentId", (req, res) => {
+router.post("/addEnfant/:parentToken", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     {
       $push: {
@@ -110,18 +124,23 @@ router.post("/addEnfant/:parentId", (req, res) => {
       },
     }
   ).then((updatedDoc) => {
-    if (updatedDoc.modifiedCount > 0) {
-      res.json({ result: true });
-    } else {
-      res.status(500).json({ result: false, error: "Error adding enfant" });
-    }
+    User.find({ token: req.params.parentToken }).then((parent) => {
+      if (updatedDoc.modifiedCount > 0) {
+        res.json({
+          result: true,
+          enfants: parent.enfants,
+        });
+      } else {
+        res.status(500).json({ result: false, error: "Error adding enfant" });
+      }
+    });
   });
 });
 
-router.delete("/removeEnfant/:parentId/:enfantId", (req, res) => {
+router.delete("/removeEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     { $pull: { enfants: { _id: req.params.enfantId } } }
   ).then((deletedDoc) => {
@@ -134,9 +153,9 @@ router.delete("/removeEnfant/:parentId/:enfantId", (req, res) => {
 });
 
 // Modifier le prénom de l'enfant d'un parent
-router.put("/updatePrenomEnfant/:parentId/:enfantId", (req, res) => {
+router.put("/updatePrenomEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
-    { _id: req.params.parentId, "enfants._id": req.params.enfantId },
+    { token: req.params.parentToken, "enfants._id": req.params.enfantId },
     { $set: { "enfants.$.prenom": req.body.prenom } }
   )
     .then(() => res.json({ result: true }))
@@ -146,9 +165,9 @@ router.put("/updatePrenomEnfant/:parentId/:enfantId", (req, res) => {
 });
 
 // Modifier l'établissement de l'enfant d'un parent
-router.put("/updateEtablissementEnfant/:parentId/:enfantId", (req, res) => {
+router.put("/updateEtablissementEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
-    { _id: req.params.parentId, "enfants._id": req.params.enfantId },
+    { token: req.params.parentToken, "enfants._id": req.params.enfantId },
     { $set: { "enfants.$.etablissement": req.body.etablissement } }
   )
     .then(() => res.json({ result: true }))
@@ -158,10 +177,10 @@ router.put("/updateEtablissementEnfant/:parentId/:enfantId", (req, res) => {
 });
 
 // A tester dans le frontend
-router.post("/addHistorique/:parentId", (req, res) => {
+router.post("/addHistorique/:parentToken", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     { $push: { historiques: req.body } }
   ).then((updatedDoc) => {
@@ -174,10 +193,10 @@ router.post("/addHistorique/:parentId", (req, res) => {
 });
 
 // A tester dans le frontend
-router.delete("/removeHistorique/:parentId/:historiqueId", (req, res) => {
+router.delete("/removeHistorique/:parentToken/:historiqueId", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     { $pull: { historiques: { _id: req.params.historiqueId } } }
   ).then((deletedDoc) => {
