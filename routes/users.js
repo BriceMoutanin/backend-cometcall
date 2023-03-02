@@ -59,7 +59,7 @@ router.post("/signin", (req, res) => {
 });
 
 // Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
-router.put("/:parentId", (req, res) => {
+router.put("/updateParentByID/:parentId", (req, res) => {
   User.updateOne(
     {
       _id: req.params.parentId,
@@ -71,7 +71,7 @@ router.put("/:parentId", (req, res) => {
 });
 
 // Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
-router.put("/:parentToken", (req, res) => {
+router.put("/updateParentByToken/:parentToken", (req, res) => {
   User.updateOne(
     {
       token: req.params.parentToken,
