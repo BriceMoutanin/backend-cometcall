@@ -70,6 +70,18 @@ router.put("/:parentId", (req, res) => {
   });
 });
 
+// Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
+router.put("/:parentToken", (req, res) => {
+  User.updateOne(
+    {
+      token: req.params.parentToken,
+    },
+    { $set: req.body }
+  ).then((data) => {
+    res.json({ result: true, result: data });
+  });
+});
+
 // supression de compte utilisateur
 router.delete("/:parentId", (req, res) => {
   User.deleteOne({
