@@ -25,7 +25,7 @@ router.post("/", (req, res) => {
     titre: req.body.titre,
     description: req.body.description,
     typeEtablissement: req.body.typeEtablissement,
-    organismes: req.body.typesOrganisme,
+    organismes: req.body.organismes,
   });
   newProb.save().then(() => {
     res.json({ result: true });
