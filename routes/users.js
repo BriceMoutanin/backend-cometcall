@@ -124,9 +124,11 @@ router.post("/addEnfant/:parentToken", (req, res) => {
       },
     }
   ).then((updatedDoc) => {
-    res.json({
-      result: true,
-      newEnfant: parent.enfants[parent.enfants.length - 1],
+    User.find({ token: req.params.parentToken }).then((parent) => {
+      res.json({
+        result: true,
+        newEnfant: parent.enfants[parent.enfants.length - 1],
+      });
     });
     // User.find({ token: req.params.parentToken }).then((parent) => {
     //   if (updatedDoc.modifiedCount > 0) {
