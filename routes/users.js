@@ -128,7 +128,7 @@ router.post("/addEnfant/:parentToken", (req, res) => {
       if (updatedDoc.modifiedCount > 0) {
         res.json({
           result: true,
-          enfants: parent.enfants,
+          newEnfant: parent.enfants[parent.enfants.length - 1],
         });
       } else {
         res.status(500).json({ result: false, error: "Error adding enfant" });
