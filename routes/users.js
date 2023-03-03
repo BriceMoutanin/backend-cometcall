@@ -124,16 +124,20 @@ router.post("/addEnfant/:parentToken", (req, res) => {
       },
     }
   ).then((updatedDoc) => {
-    User.find({ token: req.params.parentToken }).then((parent) => {
-      if (updatedDoc.modifiedCount > 0) {
-        res.json({
-          result: true,
-          newEnfant: parent.enfants[parent.enfants.length - 1],
-        });
-      } else {
-        res.status(500).json({ result: false, error: "Error adding enfant" });
-      }
+    res.json({
+      result: true,
+      newEnfant: parent.enfants[parent.enfants.length - 1],
     });
+    // User.find({ token: req.params.parentToken }).then((parent) => {
+    //   if (updatedDoc.modifiedCount > 0) {
+    //     res.json({
+    //       result: true,
+    //       newEnfant: parent.enfants[parent.enfants.length - 1],
+    //     });
+    //   } else {
+    //     res.status(500).json({ result: false, error: "Error adding enfant" });
+    //   }
+    // });
   });
 });
 
