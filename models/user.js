@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const etablissementSchema = mongoose.Schema({
   type: String,
   nom: String,
+  IDAPI: String,
 });
 
 const enfantSchema = mongoose.Schema({
