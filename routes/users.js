@@ -150,11 +150,7 @@ router.delete("/removeEnfant/:parentToken/:enfantId", (req, res) => {
     },
     { $pull: { enfants: { _id: req.params.enfantId } } }
   ).then((deletedDoc) => {
-    if (deletedDoc.matchedCount > 0) {
-      res.json({ result: true, result: deletedDoc });
-    } else {
-      res.status(500).json({ result: false, error: "Error deleting enfant" });
-    }
+    res.json({ result: true, result: deletedDoc });
   });
 });
 
