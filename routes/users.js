@@ -150,7 +150,7 @@ router.delete("/removeEnfant/:parentToken/:enfantId", (req, res) => {
     },
     { $pull: { enfants: { _id: req.params.enfantId } } }
   ).then((deletedDoc) => {
-    res.json({ result: true, result: deletedDoc });
+    res.json({ result: true });
   });
 });
 
