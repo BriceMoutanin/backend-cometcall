@@ -178,6 +178,18 @@ router.put("/updateEtablissementEnfant/:parentToken/:enfantId", (req, res) => {
     });
 });
 
+// Modifier l'enfant d'un parent
+router.put("/updateEnfant/:parentToken/:enfantId", (req, res) => {
+  User.updateOne(
+    { token: req.params.parentToken, "enfants._id": req.params.enfantId },
+    { $set: { "enfants.$": req.body } }
+  )
+    .then(() => res.json({ result: true }))
+    .catch((error) => {
+      res.status(500).json({ result: false, result: error });
+    });
+});
+
 // A tester dans le frontend
 router.post("/addHistorique/:parentToken", (req, res) => {
   User.updateOne(
