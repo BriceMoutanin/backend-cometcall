@@ -47,12 +47,21 @@ router.post("/signin", (req, res) => {
   }
   //Cette route permet à un utilisateur de s'authentifier en vérifiant son adresse e-mail et son mot de passe avec ceux stockés dans la bdd.
   User.findOne({ email: req.body.email }).then((data) => {
-    if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, user: data });
+    if (data) {
+      if (bcrypt.compareSync(req.body.password, data.password)) {
+        res.json({ result: true, user: data });
+      } else {
+        res.json({
+          result: false,
+          error: "le mot de passe ou l'adresse mail ne correspond pas",
+          code: 1,
+        });
+      }
     } else {
       res.json({
         result: false,
-        error: "l'utilisteur n'existe ou le mot de passe est erroné",
+        error: "l'utilisteur n'existe pas",
+        code: 0,
       });
     }
   });
