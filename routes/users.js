@@ -224,4 +224,14 @@ router.delete("/removeHistorique/:parentToken/:historiqueId", (req, res) => {
   });
 });
 
+router.get("/getHistorique/:parentToken", (req, res) => {
+  User.findOne({ token: req.params.parentToken }).then((data) => {
+    if (data) {
+      res.json({ result: true, historiques: data.historiques });
+    } else {
+      res.json({ result: false, error: "Utilisateur non trouvé" });
+    }
+  });
+});
+
 module.exports = router;
