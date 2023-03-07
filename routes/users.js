@@ -238,7 +238,7 @@ router.delete("/removeHistorique/:parentToken/:historiqueId", (req, res) => {
     },
     { $pull: { historiques: { _id: req.params.historiqueId } } }
   ).then((deletedDoc) => {
-    if (deletedDoc.matchedCount > 0) {
+    if (deletedDoc) {
       res.json({ result: true, result: deletedDoc });
     } else {
       res
