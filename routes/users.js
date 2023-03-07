@@ -92,6 +92,19 @@ router.put("/updateParentByToken/:parentToken", (req, res) => {
   });
 });
 
+// Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
+router.put("/updatePasswordByToken/:parentToken", (req, res) => {
+  const newHash = bcrypt.hashSync(req.body.password, 10);
+  User.updateOne(
+    {
+      token: req.params.parentToken,
+    },
+    { password: newHash }
+  ).then((data) => {
+    res.json({ result: true, result: data });
+  });
+});
+
 // suppression de compte utilisateur
 router.delete("/:parentId", (req, res) => {
   User.deleteOne({
