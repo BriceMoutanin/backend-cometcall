@@ -25,6 +25,7 @@ router.post("/signup", (req, res) => {
         nom: null,
         prenom: null,
         tel: null,
+        photoURI: null,
         enfants: [],
         historiques: [],
       });
