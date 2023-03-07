@@ -130,6 +130,7 @@ router.post("/addEnfant/:parentToken", (req, res) => {
         enfants: {
           prenom: req.body.prenom,
           etablissement: req.body.etablissement,
+          photoURI: req.body.photoURI,
         },
       },
     }
