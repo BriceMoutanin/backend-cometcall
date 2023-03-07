@@ -187,11 +187,11 @@ router.put("/updateEtablissementEnfant/:parentToken/:enfantId", (req, res) => {
     });
 });
 
-// Modifier l'enfant d'un parent
-router.put("/updateEnfant/:parentToken/:enfantId", (req, res) => {
+// Modifier la photo de l'enfant d'un parent
+router.put("/updatePhotoEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
     { token: req.params.parentToken, "enfants._id": req.params.enfantId },
-    { $set: { "enfants.$": req.body } }
+    { $set: { "enfants.$.photoURI": req.body.photoURI } }
   )
     .then(() => res.json({ result: true }))
     .catch((error) => {
