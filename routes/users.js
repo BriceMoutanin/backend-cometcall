@@ -95,9 +95,9 @@ router.put("/updateParentByToken/:parentToken", (req, res) => {
 // Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
 router.put("/updatePasswordByToken/:parentToken", (req, res) => {
   const newHash = bcrypt.hashSync(req.body.password, 10);
-  User.findOne({ email: req.body.email }).then((data) => {
+  User.findOne({ token: req.params.parentToken }).then((data) => {
     if (data) {
-      if (bcrypt.compareSync(req.body.password, data.password)) {
+      if (bcrypt.compareSync(req.body.currentPassword, data.password)) {
         User.updateOne(
           {
             token: req.params.parentToken,
