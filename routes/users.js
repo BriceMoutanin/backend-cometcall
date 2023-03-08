@@ -241,7 +241,12 @@ router.post("/addHistorique/:parentToken", (req, res) => {
     { $push: { historiques: req.body } }
   ).then((updatedDoc) => {
     if (updatedDoc) {
-      res.json({ result: true });
+      User.findOne({
+        token: req.params.parentToken,
+      }).then((data) => {
+        const hist = data.historiques[data.historiques.length - 1];
+        res.json({ result: true, historique: hist });
+      });
     } else {
       res.status(500).json({ result: false, error: "Error adding historique" });
     }
