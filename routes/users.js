@@ -104,7 +104,7 @@ router.put("/updatePasswordByToken/:parentToken", (req, res) => {
           },
           { password: newHash }
         ).then((data) => {
-          res.json({ result: true, result: data });
+          res.json({ result: true });
         });
       } else {
         res.json({
