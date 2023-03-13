@@ -25,6 +25,7 @@ router.post("/signup", (req, res) => {
         nom: null,
         prenom: null,
         tel: null,
+        photoURI: null,
         enfants: [],
         historiques: [],
       });
@@ -47,19 +48,28 @@ router.post("/signin", (req, res) => {
   }
   //Cette route permet à un utilisateur de s'authentifier en vérifiant son adresse e-mail et son mot de passe avec ceux stockés dans la bdd.
   User.findOne({ email: req.body.email }).then((data) => {
-    if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, user: data });
+    if (data) {
+      if (bcrypt.compareSync(req.body.password, data.password)) {
+        res.json({ result: true, user: data });
+      } else {
+        res.json({
+          result: false,
+          error: "le mot de passe ou l'adresse mail ne correspond pas",
+          code: 1,
+        });
+      }
     } else {
       res.json({
         result: false,
-        error: "l'utilisteur n'existe ou le mot de passe est erroné",
+        error: "l'utilisteur n'existe pas",
+        code: 0,
       });
     }
   });
 });
 
 // Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
-router.put("/:parentId", (req, res) => {
+router.put("/updateParentByID/:parentId", (req, res) => {
   User.updateOne(
     {
       _id: req.params.parentId,
@@ -70,7 +80,50 @@ router.put("/:parentId", (req, res) => {
   });
 });
 
-// supression de compte utilisateur
+// Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
+router.put("/updateParentByToken/:parentToken", (req, res) => {
+  User.updateOne(
+    {
+      token: req.params.parentToken,
+    },
+    { $set: req.body }
+  ).then((data) => {
+    res.json({ result: true, result: data });
+  });
+});
+
+// Cette route permet de mettre à jour le profil utilisateur en fonction de l'ID spécifié.
+router.put("/updatePasswordByToken/:parentToken", (req, res) => {
+  const newHash = bcrypt.hashSync(req.body.password, 10);
+  User.findOne({ token: req.params.parentToken }).then((data) => {
+    if (data) {
+      if (bcrypt.compareSync(req.body.currentPassword, data.password)) {
+        User.updateOne(
+          {
+            token: req.params.parentToken,
+          },
+          { password: newHash }
+        ).then((data) => {
+          res.json({ result: true });
+        });
+      } else {
+        res.json({
+          result: false,
+          error: "le mot de passe ou l'adresse mail ne correspond pas",
+          code: 1,
+        });
+      }
+    } else {
+      res.json({
+        result: false,
+        error: "l'utilisteur n'existe pas",
+        code: 0,
+      });
+    }
+  });
+});
+
+// suppression de compte utilisateur
 router.delete("/:parentId", (req, res) => {
   User.deleteOne({
     _id: req.params.parentId,
@@ -83,48 +136,70 @@ router.delete("/:parentId", (req, res) => {
   });
 });
 
+// Obtenir les enfants
+router.get("/getEnfants/:parentToken", (req, res) => {
+  User.findOne({ token: req.params.parentToken }).then((parent) => {
+    if (parent) {
+      res.json({
+        result: true,
+        enfants: parent.enfants,
+      });
+    } else {
+      res.status(500).json({ result: false, error: "Parent not found" });
+    }
+  });
+});
+
 // Ajouter un enfant
-router.post("/addEnfant/:parentId", (req, res) => {
+router.post("/addEnfant/:parentToken", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     {
       $push: {
         enfants: {
           prenom: req.body.prenom,
           etablissement: req.body.etablissement,
+          photoURI: req.body.photoURI,
         },
       },
     }
   ).then((updatedDoc) => {
-    if (updatedDoc.modifiedCount > 0) {
-      res.json({ result: true });
-    } else {
-      res.status(500).json({ result: false, error: "Error adding enfant" });
-    }
+    User.findOne({ token: req.params.parentToken }).then((parent) => {
+      res.json({
+        result: true,
+        newEnfant: parent.enfants[parent.enfants.length - 1],
+      });
+    });
+    // User.find({ token: req.params.parentToken }).then((parent) => {
+    //   if (updatedDoc.modifiedCount > 0) {
+    //     res.json({
+    //       result: true,
+    //       newEnfant: parent.enfants[parent.enfants.length - 1],
+    //     });
+    //   } else {
+    //     res.status(500).json({ result: false, error: "Error adding enfant" });
+    //   }
+    // });
   });
 });
 
-router.delete("/removeEnfant/:parentId/:enfantId", (req, res) => {
+router.delete("/removeEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     { $pull: { enfants: { _id: req.params.enfantId } } }
   ).then((deletedDoc) => {
-    if (deletedDoc.matchedCount > 0) {
-      res.json({ result: true, result: deletedDoc });
-    } else {
-      res.status(500).json({ result: false, error: "Error deleting enfant" });
-    }
+    res.json({ result: true });
   });
 });
 
 // Modifier le prénom de l'enfant d'un parent
-router.put("/updatePrenomEnfant/:parentId/:enfantId", (req, res) => {
+router.put("/updatePrenomEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
-    { _id: req.params.parentId, "enfants._id": req.params.enfantId },
+    { token: req.params.parentToken, "enfants._id": req.params.enfantId },
     { $set: { "enfants.$.prenom": req.body.prenom } }
   )
     .then(() => res.json({ result: true }))
@@ -134,9 +209,9 @@ router.put("/updatePrenomEnfant/:parentId/:enfantId", (req, res) => {
 });
 
 // Modifier l'établissement de l'enfant d'un parent
-router.put("/updateEtablissementEnfant/:parentId/:enfantId", (req, res) => {
+router.put("/updateEtablissementEnfant/:parentToken/:enfantId", (req, res) => {
   User.updateOne(
-    { _id: req.params.parentId, "enfants._id": req.params.enfantId },
+    { token: req.params.parentToken, "enfants._id": req.params.enfantId },
     { $set: { "enfants.$.etablissement": req.body.etablissement } }
   )
     .then(() => res.json({ result: true }))
@@ -145,16 +220,33 @@ router.put("/updateEtablissementEnfant/:parentId/:enfantId", (req, res) => {
     });
 });
 
+// Modifier la photo de l'enfant d'un parent
+router.put("/updatePhotoEnfant/:parentToken/:enfantId", (req, res) => {
+  User.updateOne(
+    { token: req.params.parentToken, "enfants._id": req.params.enfantId },
+    { $set: { "enfants.$.photoURI": req.body.photoURI } }
+  )
+    .then(() => res.json({ result: true }))
+    .catch((error) => {
+      res.status(500).json({ result: false, result: error });
+    });
+});
+
 // A tester dans le frontend
-router.post("/addHistorique/:parentId", (req, res) => {
+router.post("/addHistorique/:parentToken", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     { $push: { historiques: req.body } }
   ).then((updatedDoc) => {
-    if (updatedDoc.modifiedCount > 0) {
-      res.json({ result: true });
+    if (updatedDoc) {
+      User.findOne({
+        token: req.params.parentToken,
+      }).then((data) => {
+        const hist = data.historiques[data.historiques.length - 1];
+        res.json({ result: true, historique: hist });
+      });
     } else {
       res.status(500).json({ result: false, error: "Error adding historique" });
     }
@@ -162,19 +254,29 @@ router.post("/addHistorique/:parentId", (req, res) => {
 });
 
 // A tester dans le frontend
-router.delete("/removeHistorique/:parentId/:historiqueId", (req, res) => {
+router.delete("/removeHistorique/:parentToken/:historiqueId", (req, res) => {
   User.updateOne(
     {
-      _id: req.params.parentId,
+      token: req.params.parentToken,
     },
     { $pull: { historiques: { _id: req.params.historiqueId } } }
   ).then((deletedDoc) => {
-    if (deletedDoc.matchedCount > 0) {
+    if (deletedDoc) {
       res.json({ result: true, result: deletedDoc });
     } else {
       res
         .status(500)
         .json({ result: false, error: "Error deleting historique" });
+    }
+  });
+});
+
+router.get("/getHistorique/:parentToken", (req, res) => {
+  User.findOne({ token: req.params.parentToken }).then((data) => {
+    if (data) {
+      res.json({ result: true, historiques: data.historiques });
+    } else {
+      res.json({ result: false, error: "Utilisateur non trouvé" });
     }
   });
 });

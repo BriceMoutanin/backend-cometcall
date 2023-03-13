@@ -3,10 +3,12 @@ const mongoose = require("mongoose");
 const etablissementSchema = mongoose.Schema({
   type: String,
   nom: String,
+  IDAPI: String,
 });
 
 const enfantSchema = mongoose.Schema({
   prenom: String,
+  photoURI: String,
   etablissement: etablissementSchema,
 });
 
@@ -26,7 +28,7 @@ const userSchema = mongoose.Schema({
   token: String,
   email: String,
   tel: String,
-
+  photoURI: String,
   enfants: [enfantSchema],
   historiques: [historiqueSchema],
 });
