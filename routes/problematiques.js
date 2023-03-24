@@ -20,6 +20,7 @@ router.get("/:problematiqueId", (req, res) => {
 });
 
 // Route à tester dans le frontend
+// Route non utilisée pour le moment (pourra servir éventuellement si on veut ajouter une problématique depuis le frontend)
 router.post("/", (req, res) => {
   const newProb = new Problematique({
     titre: req.body.titre,
